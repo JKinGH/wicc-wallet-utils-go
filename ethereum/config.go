@@ -21,7 +21,7 @@ type Config struct {
 	Decimals int32
 	//是否开启Debug
 	Debug bool
-	//ChainID ， Mainnet：0 ，Ropsten：3 ， Rinkeby：4
+	//ChainID ， Mainnet：1 ，Ropsten：3 ， Rinkeby：4
 	ChainID int64
 	//Keystore 存储路径
 	KeystoreDir string
