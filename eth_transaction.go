@@ -2,6 +2,8 @@ package wicc_wallet_utils_go
 
 import (
 	"encoding/hex"
+	"encoding/json"
+	"fmt"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/rlp"
@@ -89,4 +91,46 @@ func (transaction *ETHTransaction) CreateRawTx(privateKeyStr string, chainId int
 }
 
 
+type DecodedTx struct {
+	Chainid *big.Int
+	From string
+	To string
+	Value *big.Int
+	Data string
+	Nonce uint64
+	GasPrice *big.Int
+	GasLimit uint64
+}
+
+func DecodeETHRawTx(rawTXstring string) ([]byte, error){
+
+	var tx *types.Transaction
+
+	rawtx, err := hex.DecodeString(rawTXstring)
+	if err != nil{
+		fmt.Println(err)
+	}
+	err = rlp.DecodeBytes(rawtx, &tx)
+	if err != nil{
+		fmt.Println(err)
+	}
+
+	msg,err := tx.AsMessage( types.NewEIP155Signer(big.NewInt(1)))
+	if err != nil{
+		fmt.Println(err)
+	}
+
+	txInfo := DecodedTx{
+		Chainid:tx.ChainId(),
+		From : msg.From().String(),
+		To : tx.To().String(),
+		Value :tx.Value(),
+		Data :hex.EncodeToString(tx.Data()),
+		Nonce :tx.Nonce(),
+		GasPrice :tx.GasPrice(),
+		GasLimit :tx.Gas(),
+	}
+
+	return json.MarshalIndent(&txInfo, "", "\t")
+}
 
